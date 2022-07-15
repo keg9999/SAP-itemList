@@ -1,0 +1,117 @@
+---
+_schema-version: '3.1'
+ID: ItemList
+version: 1.0.0
+description: "A simple CAP project."
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+   - builder: custom
+     commands:
+      - npm install --production
+      - npx -p @sap/cds-dk cds build --production
+      - npx rimraf gen/db/src/gen/data
+
+modules:
+  - name: ItemList-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm-ci
+    provides:
+      - name: srv-api # required by consumers of CAP services (e.g. approuter)
+        properties:
+          srv-url: ${default-url}
+    requires:
+      - name: ItemList-db
+      - name: ItemList-uaa
+
+  - name: ItemList-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    requires:
+      - name: ItemList-db
+
+  - name: ItemList-destinations
+    type: com.sap.application.content
+    requires:
+      - name: ItemList-uaa
+        parameters:
+          service-key:
+            name: ItemList-uaa-key
+      - name: ItemList-html5-repo-host
+        parameters:
+          service-key:
+            name: ItemList-html5-repo-host-key
+      - name: srv-api
+      - name: ItemList-destination
+        parameters:
+          content-target: true
+    parameters:
+      content:
+        instance:
+          destinations:
+            - Authentication: OAuth2UserTokenExchange
+              Name: ItemList-app-srv
+              TokenServiceInstanceName: ItemList-uaa
+              TokenServiceKeyName: ItemList-uaa-key
+              URL: '~{srv-api/srv-url}'
+              sap.cloud.service: ItemList.service
+            - Name: ItemList-html5-repo-host
+              ServiceInstanceName: ItemList-html5-repo-host
+              ServiceKeyName: ItemList-html5-repo-host-key
+              sap.cloud.service: ItemList.service
+            - Authentication: OAuth2UserTokenExchange
+              Name: ItemList-uaa
+              ServiceInstanceName: ItemList-uaa
+              ServiceKeyName: ItemList-uaa-key
+              sap.cloud.service: ItemList.service
+          existing_destinations_policy: update
+    build-parameters:
+      no-source: true
+
+resources:
+  - name: ItemList-db
+    type: com.sap.xs.hdi-container
+    parameters:
+      service: hana # or 'hanatrial' on trial landscapes
+      service-plan: hdi-shared
+    properties:
+      hdi-service-name: ${service-name}
+  - name: ItemList-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: xsuaa
+      service-plan: application
+      path: ./xs-security.json
+      config:
+        xsappname: ItemList-${space}    #  name + space dependency
+        tenant-mode: dedicated
+        role-collections:
+          - name: 'ItemManager-${space}'
+            description: Manage Items
+            role-template-references:
+              - $XSAPPNAME.ItemManager
+          - name: 'ItemViewer-${space}'
+            description: View Items
+            role-template-references:
+              - $XSAPPNAME.ItemViewer
+  - name: ItemList-destination
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: destination
+      service-plan: lite
+      config:
+        HTML5Runtime_enabled: true
+  - name: ItemList-html5-repo-host
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+
+
