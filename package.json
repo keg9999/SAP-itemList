@@ -8,7 +8,8 @@
   "dependencies": {
     "@sap/cds": "^5",
     "express": "^4",
-    "passport": "^0.6.0"
+    "passport": "^0.6.0",
+    "hdb": "^0.18.3"
   },
   "devDependencies": {
     "@sap/ux-specification": "^1.102.1",
@@ -45,5 +46,15 @@
   },
   "sapux": [
     "app/items"
-  ]
+  ],
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sql"
+      }
+    },
+    "hana": {
+      "deploy-format": "hdbtable"
+    }
+  }
 }
