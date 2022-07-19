@@ -9,7 +9,8 @@
     "@sap/cds": "^5",
     "express": "^4",
     "passport": "^0.6.0",
-    "hdb": "^0.18.3"
+    "hdb": "^0.18.3",
+    "@sap/xssec": "^3"
   },
   "devDependencies": {
     "@sap/ux-specification": "^1.102.1",
@@ -51,6 +52,9 @@
     "requires": {
       "db": {
         "kind": "sql"
+      },
+      "uaa": {
+        "kind": "xsuaa"
       }
     },
     "hana": {

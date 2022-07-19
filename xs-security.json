@@ -1,0 +1,31 @@
+{
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.ItemViewer",
+      "description": "ItemViewer"
+    },
+    {
+      "name": "$XSAPPNAME.ItemManager",
+      "description": "ItemManager"
+    }
+  ],
+  "attributes": [],
+  "role-templates": [
+    {
+      "name": "ItemViewer",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.ItemViewer"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "ItemManager",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.ItemManager"
+      ],
+      "attribute-references": []
+    }
+  ]
+}
