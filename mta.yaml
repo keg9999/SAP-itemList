@@ -9,6 +9,7 @@ modules:
   requires:
   - name: itemList-db
   - name: itemList-uaa
+  - name: itemList-logs
   provides:
   - name: srv-api
     properties:
@@ -22,6 +23,7 @@ modules:
   path: gen/db
   requires:
   - name: itemList-db
+  - name: itemList-logs
   parameters:
     buildpack: nodejs_buildpack
 - name: itemList-destinations
@@ -132,6 +134,11 @@ resources:
   parameters:
     service: html5-apps-repo
     service-plan: app-host
+- name: itemList-logs
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: application-logs
+    service-plan: lite
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true
