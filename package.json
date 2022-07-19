@@ -16,6 +16,9 @@
     "@sap/ux-specification": "^1.102.1",
     "sqlite3": "^5.0.2"
   },
+  "engines": {
+    "node": "^16"
+  },
   "scripts": {
     "start": "cds run",
     "watch-items": "cds watch --open items/webapp/index.html?sap-ui-xx-viewCache=false"
